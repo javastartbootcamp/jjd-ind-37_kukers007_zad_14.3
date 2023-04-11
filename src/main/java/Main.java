@@ -16,11 +16,15 @@ public class Main {
     void run(Scanner scanner) {
         // usupełnij metodę
         String filename = "countries.csv";
-        Map<String, Country> countries = readCountriesFromFile(filename);
-        if (countries == null) {
-            System.out.println("Brak pliku countries.csv");
-            return;
+        try {
+            Map<String, Country> countries = readCountriesFromFile(filename);
+            searchCountryByCode(scanner, countries);
+        } catch (FileNotFoundException e) {
+            System.err.println("File not found.");
         }
+    }
+
+    private static void searchCountryByCode(Scanner scanner, Map<String, Country> countries) {
         System.out.println("Podaj kod kraju, o którym chcesz zobaczyć informacje:");
         String countryCode = scanner.nextLine();
         Country country = countries.get(countryCode);
@@ -31,23 +35,18 @@ public class Main {
         }
     }
 
-    private Map<String, Country> readCountriesFromFile(String filename) {
+    private Map<String, Country> readCountriesFromFile(String filename) throws FileNotFoundException {
         Map<String, Country> countries = new HashMap<>();
-        try {
-            Scanner scanner = new Scanner(new File(filename));
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                String[] records = line.split(";");
-                String code = records[0];
-                String name = records[1];
-                int population = Integer.parseInt(records[2]);
-                countries.put(code, new Country(code, name, population));
-            }
-            scanner.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("Brak pliku " + filename + ".");
-            return null;
+        Scanner scanner = new Scanner(new File(filename));
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            String[] records = line.split(";");
+            String code = records[0];
+            String name = records[1];
+            int population = Integer.parseInt(records[2]);
+            countries.put(code, new Country(code, name, population));
         }
+        scanner.close();
         return countries;
     }
 }
